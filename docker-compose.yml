@@ -1,0 +1,48 @@
+version: '3.8'
+services:
+  frontend:
+    container_name: react-frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    networks:
+      - app-network
+
+  backend:
+    container_name: django-backend
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    depends_on:
+      - mongo
+    # environment:
+    #   - MONGO_URL=mongodb://mongo-database:27017/Rihla_db
+    networks:
+      - app-network
+
+  mongo:   
+    container_name: mongo-database
+    image: mongo:latest
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+      # - ./mongo-init:/docker-entrypoint-initdb.d/
+    environment:
+      MONGO_INITDB_DATABASE: Rihla_db
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  mongo-data:
